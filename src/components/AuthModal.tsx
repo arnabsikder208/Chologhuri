@@ -3,6 +3,8 @@ import { X, User, Mail, Lock, CheckCircle2, Compass, ShieldCheck } from 'lucide-
 import { PersonaType, AuthUser } from '../types/travel';
 import { useI18n } from '../i18n';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -59,10 +61,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const endpoint = isLogin ? '/routes/auth/login' : '/routes/auth/register';
       const body = isLogin ? { email, password } : { name, email, password, phone, role };
 
-      const response = await fetch(endpoint, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

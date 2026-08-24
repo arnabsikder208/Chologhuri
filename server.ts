@@ -6,6 +6,16 @@ import dotenv from "dotenv";
 import connectDB from "./server/db";
 import authRoutes from './server/routes/auth.js';
 import tripRoutes from './server/routes/trips.js';
+import cors from 'cors';
+
+app.use(cors({
+  origin: [
+    'https://chologhuri.vercel.app', // Your Vercel frontend domain
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
+  credentials: true
+}));
 
 dotenv.config();
 
