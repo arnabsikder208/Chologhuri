@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { TripPlan, PersonaType } from '../../types/travel';
 import { useI18n } from '../../i18n';
+import { API_URL } from '../../config';
 
 interface AITripPlannerViewProps {
   onSaveTrip: (trip: TripPlan) => Promise<boolean>;
@@ -78,7 +79,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
     setSavedSuccess(false);
 
     try {
-      const response = await fetch('/api/plan-trip', {
+      const response = await fetch(`${API_URL}/api/plan-trip`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

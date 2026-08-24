@@ -7,6 +7,7 @@ import { DestinationDetailModal } from './components/DestinationDetailModal';
 import { HotelDetailModal } from './components/HotelDetailModal';
 import { PriceComparisonModal } from './components/PriceComparisonModal';
 import { I18nProvider } from './i18n';
+import { API_URL } from './config';
 
 // Views
 import { HomeView } from './components/views/HomeView';
@@ -139,7 +140,10 @@ export function App() {
         ...((init.headers as Record<string, string>) || {}),
       };
       if (token) headers.Authorization = `Bearer ${token}`;
-      return fetch(input, { ...init, headers });
+      const url = typeof input === 'string' && input.startsWith('/api/')
+        ? `${API_URL}${input}`
+        : input;
+      return fetch(url, { ...init, headers });
     },
     [token]
   );
@@ -153,7 +157,7 @@ export function App() {
         return;
       }
       try {
-        const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         if (!cancelled) {
           if (res.ok && data.user) {

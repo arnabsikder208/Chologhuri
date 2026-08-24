@@ -6,20 +6,37 @@ import dotenv from "dotenv";
 import connectDB from "./server/db";
 import authRoutes from './server/routes/auth.js';
 import tripRoutes from './server/routes/trips.js';
-import cors from 'cors';
-
-app.use(cors({
-  origin: [
-    'https://chologhuri.vercel.app', // Your Vercel frontend domain
-    'http://localhost:3000',
-    'http://localhost:5173'
-  ],
-  credentials: true
-}));
 
 dotenv.config();
 
 const app = express();
+
+// Allow the Vercel frontend to call this Render API in production.
+// Keep localhost origins for local development.
+const allowedOrigins = new Set([
+  'https://chologhuri.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+]);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '2mb' }));

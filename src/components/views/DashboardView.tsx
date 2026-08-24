@@ -22,6 +22,7 @@ import {
 import { UserProfile, TripPlan } from '../../types/travel';
 import { useI18n } from '../../i18n';
 import { LogOut } from 'lucide-react';
+import { API_URL } from '../../config';
 
 interface DashboardViewProps {
   user: UserProfile;
@@ -83,7 +84,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     setApiResponse(null);
     try {
       if (apiMethod === 'POST') {
-        const res = await fetch(apiEndpoint, {
+        const url = apiEndpoint.startsWith('/api/') ? `${API_URL}${apiEndpoint}` : apiEndpoint;
+        const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: apiReqBody,
@@ -91,7 +93,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         const data = await res.json();
         setApiResponse(JSON.stringify(data, null, 2));
       } else {
-        const res = await fetch(apiEndpoint);
+        const url = apiEndpoint.startsWith('/api/') ? `${API_URL}${apiEndpoint}` : apiEndpoint;
+        const res = await fetch(url);
         const data = await res.json();
         setApiResponse(JSON.stringify(data, null, 2));
       }
