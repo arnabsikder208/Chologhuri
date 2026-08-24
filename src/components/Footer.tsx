@@ -105,38 +105,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, setDistrictFilter 
             </ul>
           </div>
 
-          {/* Developer & Architecture Docs */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-100">
-              {t('footer.developer')}
-            </h4>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <button onClick={() => setActiveTab('dashboard')} className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-teal-400" />
-                  <span>MongoDB Collections Schema</span>
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('dashboard')} className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Code className="w-3.5 h-3.5 text-teal-400" />
-                  <span>REST API Specifications</span>
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('dashboard')} className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-teal-400" />
-                  <span>Visual ER Diagram</span>
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('dashboard')} className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-teal-400" />
-                  <span>PDF Wireframe Alignment</span>
-                </button>
-              </li>
-            </ul>
-          </div>
+
 
         </div>
 
