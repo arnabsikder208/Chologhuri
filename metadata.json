@@ -1,0 +1,6 @@
+{
+  "name": "CholoGhuri",
+  "description": "AI-powered travel ecosystem for Chattogram Division, Bangladesh featuring smart itineraries, hotel & spot exploration, blogs, community, and trip dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
