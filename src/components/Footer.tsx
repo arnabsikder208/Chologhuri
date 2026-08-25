@@ -2,6 +2,7 @@ import React from 'react';
 import { useI18n } from '../i18n';
 import { Compass, MapPin, Phone, ShieldCheck, Mail, Heart, Database, Code, FileText, Layers } from 'lucide-react';
 
+
 interface FooterProps {
   setActiveTab: (tab: string) => void;
   setDistrictFilter?: (district: string) => void;
