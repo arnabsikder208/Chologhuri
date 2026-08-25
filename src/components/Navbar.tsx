@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { UserProfile, ThemeMode } from '../types/travel';
 import { useI18n, TranslationKey } from '../i18n';
+import logo from '../assets/logo.jpeg';
 
 interface NavbarProps {
   activeTab: string;
@@ -113,8 +114,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center justify-between gap-4 h-[72px]">
             {/* Brand */}
             <button onClick={() => handleNavClick('home')} className="flex items-center gap-3 group shrink-0">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-105 group-hover:rotate-6 transition-transform duration-300">
-                <Compass className="w-5.5 h-5.5" />
+              <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-300">
+                <img src={logo} alt="CholoGhuri logo" className="w-full h-full object-cover" />
               </div>
               <div className="text-left">
                 <div className="text-lg font-extrabold tracking-tight leading-none text-[var(--text-primary)]">
