@@ -108,17 +108,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40">
-      {/* Thin notice banner */}
-      <div className="bg-emerald-950/90 dark:bg-emerald-950/70 backdrop-blur-md text-emerald-100 text-[11px] py-1.5 px-4 text-center flex items-center justify-center gap-2">
-        <span className="bg-emerald-600/80 text-white font-semibold px-2 py-0.5 rounded-md text-[10px] tracking-wide uppercase">
-          MVP V1.0
-        </span>
-        <span className="hidden sm:inline">
-          {t('nav.banner')} <strong>{t('nav.bannerDivision')}</strong> (Sajek, Cox's Bazar, Bandarban, Rangamati, Sitakunda & Patenga)
-        </span>
-        <span className="sm:hidden">{t('nav.bannerDivision')}</span>
-      </div>
-
       <div className="glass-header">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4 h-[72px]">
