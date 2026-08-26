@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { TripPlan, PersonaType } from '../../types/travel';
 import { useI18n } from '../../i18n';
-import { API_URL } from '../../config';
 
 interface AITripPlannerViewProps {
   onSaveTrip: (trip: TripPlan) => Promise<boolean>;
@@ -79,7 +78,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
     setSavedSuccess(false);
 
     try {
-      const response = await fetch(`${API_URL}/api/plan-trip`, {
+      const response = await fetch('/api/plan-trip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -111,7 +110,6 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
 
   const handleSaveToMyTrips = async () => {
     if (!generatedPlan) return;
-    // Guests are asked to log in first; the trip is stored against their account
     if (!isAuthenticated) {
       openAuthModal();
       return;
@@ -125,7 +123,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
   return (
     <div className="space-y-8 pb-12 max-w-6xl mx-auto">
       
-      {/* 1. Header matching Wireframe Page 12 ("AI Travel Assistance") */}
+      {/* 1. Header */}
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-300">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
@@ -137,10 +135,10 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
         </p>
       </div>
 
-      {/* 2. Main Wireframe Layout matching Page 12 (Input Box + Travel Recommendations sidebar) */}
+      {/* 2. Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Input Form Box matching Page 12 Wireframe */}
+        {/* Input Form Box */}
         <div className="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-md space-y-6">
           <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
             <Compass className="w-4 h-4 text-emerald-600" />
@@ -166,7 +164,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
               </div>
             </div>
 
-            {/* Budget Dropdown / Range */}
+            {/* Budget Range (Updated max to 100000) */}
             <div>
               <label className="block text-slate-700 font-bold mb-1">
                 Estimated Total Budget: <span className="text-emerald-700 font-extrabold">{formatCost(budgetBDT)}</span>
@@ -174,7 +172,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
               <input
                 type="range"
                 min="3000"
-                max="30000"
+                max="100000"
                 step="1000"
                 value={budgetBDT}
                 onChange={(e) => setBudgetBDT(Number(e.target.value))}
@@ -219,7 +217,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
               </div>
             </div>
 
-            {/* Generate Plan Button matching Page 12 wireframe ("Generate Plan") */}
+            {/* Generate Plan Button */}
             <button
               type="submit"
               disabled={isGenerating}
@@ -240,7 +238,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
           </form>
         </div>
 
-        {/* Travel Recommendation Sidebar matching Page 12 Wireframe */}
+        {/* Travel Recommendation Sidebar */}
         <div className="bg-slate-900 text-slate-200 rounded-3xl p-6 border border-slate-800 space-y-5">
           <h3 className="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
             <Lightbulb className="w-4 h-4 text-amber-400" />
@@ -276,7 +274,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
 
       </div>
 
-      {/* 3. OUTPUT OF GIVEN INFORMATION Box matching Page 12 Wireframe */}
+      {/* 3. Output Plan Box */}
       {generatedPlan && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-xl space-y-6 animate-in fade-in slide-in-from-bottom-4">
           
@@ -367,4 +365,4 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
 
     </div>
   );
-};
+}
