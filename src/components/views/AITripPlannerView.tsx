@@ -164,7 +164,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
               </div>
             </div>
 
-            {/* Budget Range (Updated max to 100000) */}
+            {/* Budget Range (Max set to 100,000) */}
             <div>
               <label className="block text-slate-700 font-bold mb-1">
                 Estimated Total Budget: <span className="text-emerald-700 font-extrabold">{formatCost(budgetBDT)}</span>
@@ -180,7 +180,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
               />
             </div>
 
-            {/* Days Dropdown */}
+            {/* Days Dropdown (Includes 30 Days / 1 Month) */}
             <div>
               <label className="block text-slate-700 font-bold mb-1">Duration (Days)</label>
               <div className="relative">
@@ -196,6 +196,7 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
                   <option value={4}>4 Days Extended Trek</option>
                   <option value={5}>5 Days Full Expedition</option>
                   <option value={7}>7 Days Comprehensive Tour</option>
+                  <option value={30}>30 Days (1 Month Extended Stay)</option>
                 </select>
               </div>
             </div>
@@ -365,4 +366,4 @@ export const AITripPlannerView: React.FC<AITripPlannerViewProps> = ({
 
     </div>
   );
-}
+};
