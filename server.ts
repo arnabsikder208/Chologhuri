@@ -74,25 +74,29 @@ app.get("/api/health", (req, res) => {
 
 // AI Trip Planner Endpoint
 app.post("/api/plan-trip", async (req, res) => {
+  const { destination, days = 3, budgetBDT = 10000, persona = "Solo Travelers" } = req.body;
+  const numericDays = Math.max(1, Number(days) || 3);
+  const numericBudget = Math.max(0, Number(budgetBDT) || 10000);
+
   try {
-    const { destination, days = 3, budgetBDT = 10000, persona = "Solo Travelers" } = req.body;
     const ai = getGeminiClient();
 
     if (ai) {
-      const prompt = `You are an expert Bangladesh travel planner for CholoGhuri.
+      try {
+        const prompt = `You are an expert Bangladesh travel planner for CholoGhuri.
 Generate a realistic day-by-day travel itinerary strictly inside Chattogram Division, Bangladesh for the destination: "${destination}".
 Trip Details:
-- Duration: ${days} days
-- Total Budget: ৳${budgetBDT} BDT
+- Duration: ${numericDays} days
+- Total Budget: ৳${numericBudget} BDT
 - Traveler Persona: ${persona}
 
 Return your response strictly as valid JSON matching this structure:
 {
-  "title": "Custom ${days}-Day ${destination} ${persona} Experience",
+  "title": "Custom ${numericDays}-Day ${destination} ${persona} Experience",
   "destination": "${destination}",
-  "days": ${days},
-  "budgetBDT": ${budgetBDT},
-  "budgetUSD": ${Math.round(budgetBDT / 115)},
+  "days": ${numericDays},
+  "budgetBDT": ${numericBudget},
+  "budgetUSD": ${Math.round(numericBudget / 115)},
   "persona": "${persona}",
   "itinerary": [
     {
@@ -101,7 +105,7 @@ Return your response strictly as valid JSON matching this structure:
       "morning": "Morning activity description...",
       "afternoon": "Afternoon activity & local food...",
       "evening": "Evening sunset or relaxation...",
-      "estExpenseBDT": ${Math.round(budgetBDT / days)}
+      "estExpenseBDT": ${Math.round(numericBudget / numericDays)}
     }
   ],
   "placesVisited": ["Spot 1", "Spot 2"],
@@ -109,31 +113,35 @@ Return your response strictly as valid JSON matching this structure:
   "notes": "Essential travel advice, security tip, or packing note."
 }`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          temperature: 0.7,
-        },
-      });
+        const response = await ai.models.generateContent({
+          model: "gemini-3.6-flash",
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
 
-      const responseText = response.text || "";
-      try {
+        const responseText = response.text || "";
         const parsed = JSON.parse(responseText.trim());
-        return res.json({ success: true, plan: parsed, source: "gemini-ai" });
-      } catch (parseErr) {
-        console.warn("JSON parse failed for Gemini response, using fallback format");
+
+        if (parsed && Array.isArray(parsed.itinerary) && parsed.itinerary.length > 0) {
+          return res.json({ success: true, plan: parsed, source: "gemini-ai" });
+        }
+
+        console.warn("Gemini returned an incomplete plan; using fallback planner.");
+      } catch (aiError) {
+        console.error("Gemini planner failed; using fallback planner:", aiError);
       }
     }
 
-    // Smart Fallback itinerary generator if Gemini API key is unconfigured
-    const perDayBudget = Math.round(budgetBDT / Math.max(1, days));
-    const fallbackItinerary = Array.from({ length: Number(days) }, (_, i) => ({
+    // Smart fallback itinerary generator. This also runs when Gemini is
+    // unavailable, misconfigured, rate-limited, or returns invalid JSON.
+    const perDayBudget = Math.round(numericBudget / numericDays);
+    const fallbackItinerary = Array.from({ length: numericDays }, (_, i) => ({
       day: i + 1,
-      title: i === 0 
+      title: i === 0
         ? `Journey to ${destination} & Scenic Overview`
-        : i === Number(days) - 1
+        : i === numericDays - 1
         ? `Final Spot Visits & Return to Chattogram`
         : `Deep Exploration of ${destination} Landmarks`,
       morning: `Early morning departure and breakfast. Trek or drive to primary attraction in ${destination}.`,
@@ -145,12 +153,12 @@ Return your response strictly as valid JSON matching this structure:
     return res.json({
       success: true,
       plan: {
-        title: `${days}-Day ${destination} ${persona} Tour`,
+        title: `${numericDays}-Day ${destination} ${persona} Tour`,
         destination,
-        district: destination.includes("Sajek") || destination.includes("Kaptai") ? "Rangamati" : "Chattogram City",
-        days: Number(days),
-        budgetBDT: Number(budgetBDT),
-        budgetUSD: Math.round(Number(budgetBDT) / 115),
+        district: destination?.includes("Sajek") || destination?.includes("Kaptai") ? "Rangamati" : "Chattogram City",
+        days: numericDays,
+        budgetBDT: numericBudget,
+        budgetUSD: Math.round(numericBudget / 115),
         persona,
         status: "Upcoming",
         itinerary: fallbackItinerary,
@@ -160,9 +168,12 @@ Return your response strictly as valid JSON matching this structure:
       },
       source: "standard-planner",
     });
-  } catch (error: any) {
-    console.error("Error generating trip plan:", error);
-    return res.status(500).json({ error: "Failed to generate trip plan." });
+  } catch (error) {
+    console.error("Unexpected error generating trip plan:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to generate trip plan.",
+    });
   }
 });
 
@@ -173,22 +184,27 @@ app.post("/api/chat", async (req, res) => {
     const ai = getGeminiClient();
 
     if (ai) {
-      const response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
-        contents: message,
-        config: {
-          systemInstruction:
-            "You are CholoGhuri's AI Travel Assistant specialized strictly in Chattogram Division, Bangladesh (Sajek, Cox's Bazar, Bandarban, Rangamati, Sitakunda, Patenga, Foy's Lake, Mirsarai, St. Martin). Provide warm, concise, practical travel guidance including transport routes, cost in BDT, best visiting hours, and local food recommendations.",
-        },
-      });
-      return res.json({ reply: response.text });
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-3.6-flash",
+          contents: message,
+          config: {
+            systemInstruction:
+              "You are CholoGhuri's AI Travel Assistant specialized strictly in Chattogram Division, Bangladesh (Sajek, Cox's Bazar, Bandarban, Rangamati, Sitakunda, Patenga, Foy's Lake, Mirsarai, St. Martin). Provide warm, concise, practical travel guidance including transport routes, cost in BDT, best visiting hours, and local food recommendations.",
+          },
+        });
+        return res.json({ reply: response.text });
+      } catch (aiError) {
+        console.error("Gemini chat failed; using offline response:", aiError);
+      }
     }
 
     // Friendly offline advice fallback
     return res.json({
       reply: `Regarding "${message}": For destinations in Chattogram Division like Sajek, Nilgiri, or Chandranath Hill, the best time to visit is October to March (or July-Sept for monsoonal waterfalls). Chander Gari jeeps are standard transport in hill districts. Feel free to use our AI Trip Planner tab for a custom itinerary!`,
     });
-  } catch (err: any) {
+  } catch (err) {
+    console.error("Chat endpoint failed:", err);
     return res.status(500).json({ reply: "Sorry, I am having trouble connecting to AI assistant right now." });
   }
 });
